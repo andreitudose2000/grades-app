@@ -1,10 +1,10 @@
 package com.andreitudose.progwebjava.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-
-import java.math.BigDecimal;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="courses")
@@ -28,8 +28,10 @@ public class Course {
     @Min(value = 1)
     private Integer numberOfCredits;
 
-    @Column(precision = 4, scale = 2)
-    private BigDecimal grade;
+    @Min(0)
+    @Max(10)
+    @NotNull
+    private int grade;
 
 
     public Integer getId() {
@@ -64,11 +66,11 @@ public class Course {
         this.numberOfCredits = numberOfCredits;
     }
 
-    public BigDecimal getGrade() {
+    public int getGrade() {
         return grade;
     }
 
-    public void setGrade(BigDecimal grade) {
+    public void setGrade(int grade) {
         this.grade = grade;
     }
 

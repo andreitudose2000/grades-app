@@ -3,7 +3,9 @@ package com.andreitudose.progwebjava.controllers;
 import com.andreitudose.progwebjava.dtos.CourseTypeDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.CourseTypeRequestDto;
 import com.andreitudose.progwebjava.dtos.CourseTypeResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.CourseTypeService;
 import jakarta.validation.Valid;
@@ -49,7 +51,7 @@ public class CourseTypeController {
             @PathVariable Integer programmeId,
             @Valid @RequestBody CourseTypeRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = courseTypeService.create(studentId, programmeId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -69,7 +71,7 @@ public class CourseTypeController {
             @PathVariable Integer id,
             @Valid @RequestBody CourseTypeRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = courseTypeService.update(studentId, programmeId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();

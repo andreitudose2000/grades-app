@@ -3,9 +3,9 @@ package com.andreitudose.progwebjava.controllers;
 import com.andreitudose.progwebjava.dtos.SemesterResponseDto;
 import com.andreitudose.progwebjava.dtos.SemesterRequestDto;
 import com.andreitudose.progwebjava.dtos.SemesterDetailedResponseDto;
-import com.andreitudose.progwebjava.dtos.YearOfStudyRequestDto;
-import com.andreitudose.progwebjava.dtos.YearOfStudyResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.SemesterService;
 import jakarta.validation.Valid;
@@ -55,7 +55,7 @@ public class SemesterController {
             @PathVariable Integer yearOfStudyId,
             @Valid @RequestBody SemesterRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = semesterService.create(studentId, programmeId, yearOfStudyId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -77,7 +77,7 @@ public class SemesterController {
             @PathVariable Integer id,
             @Valid @RequestBody SemesterRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = semesterService.update(studentId, programmeId, yearOfStudyId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -103,5 +103,15 @@ public class SemesterController {
         semesterService.delete(studentId, programmeId, yearOfStudyId, id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}/average")
+    public Double getAverage(@PathVariable Integer id) throws NotFoundException {
+        return semesterService.getGradeAverage(id);
+    }
+
+    @GetMapping("/{id}/credits")
+    public Integer getAccumulatedCredits(@PathVariable Integer id) throws NotFoundException {
+        return semesterService.getTotalCredits(id);
     }
 }

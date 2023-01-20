@@ -2,28 +2,36 @@ package com.andreitudose.progwebjava.services;
 
 import com.andreitudose.progwebjava.dtos.CourseRequestDto;
 import com.andreitudose.progwebjava.dtos.CourseResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.model.*;
 import com.andreitudose.progwebjava.repositories.CourseRepository;
+import com.andreitudose.progwebjava.repositories.CourseTypeRepository;
 import com.andreitudose.progwebjava.repositories.StudentRepository;
+import com.andreitudose.progwebjava.utils.ValidationUtils;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
     private final CourseRepository courseRepository;
+    private final CourseTypeRepository courseTypeRepository;
     private final StudentRepository studentRepository;
     private final Validator validator;
 
     public CourseService(CourseRepository courseRepository,
+                         CourseTypeRepository courseTypeRepository,
                          StudentRepository studentRepository) {
         this.courseRepository = courseRepository;
+        this.courseTypeRepository = courseTypeRepository;
         this.studentRepository = studentRepository;
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -66,15 +74,26 @@ public class CourseService {
                                     Integer yearOfStudyId,
                                     Integer semesterId,
                                     CourseRequestDto request)
-            throws NotFoundException {
+            throws NotFoundException, BadRequestException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<CourseRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var semester = getSemesterIfExists(studentId, programmeId, yearOfStudyId, semesterId);
+
+        var courseType = courseTypeRepository.findById(request.getCourseTypeId());
+
+        if(courseType.isEmpty()) {
+            throw new NotFoundException("Course type", "id", request.getCourseTypeId().toString());
+        }
 
         Course course = request.toCourse(new Course());
 
         course.setSemester(semester);
+        course.setCourseType(courseType.get());
 
         var createdCourse = courseRepository.save(course);
 
@@ -87,9 +106,13 @@ public class CourseService {
                                     Integer semesterId,
                                     Integer id,
                                     CourseRequestDto request)
-            throws NotFoundException {
+            throws NotFoundException, BadRequestException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<CourseRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var semester = getSemesterIfExists(studentId, programmeId, yearOfStudyId, semesterId);
 
@@ -134,7 +157,7 @@ public class CourseService {
         var programme = student.getProgrammes().stream().filter(x -> x.getId().equals(programmeId)).findFirst();
 
         if(programme.isEmpty()) {
-            throw new NotFoundException("Programme", "id", studentId.toString());
+            throw new NotFoundException("Programme", "id", programmeId.toString());
         }
 
         return programme.get();
@@ -151,7 +174,7 @@ public class CourseService {
         var yearOfStudy = programme.getYearsOfStudy().stream().filter(x -> x.getId().equals(yearOfStudyId)).findFirst();
 
         if(yearOfStudy.isEmpty()) {
-            throw new NotFoundException("Year of study", "id", studentId.toString());
+            throw new NotFoundException("Year of study", "id", yearOfStudyId.toString());
         }
 
         return yearOfStudy.get();

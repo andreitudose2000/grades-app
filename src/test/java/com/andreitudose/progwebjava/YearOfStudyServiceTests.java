@@ -3,6 +3,7 @@ package com.andreitudose.progwebjava;
 import com.andreitudose.progwebjava.dtos.*;
 import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.model.Programme;
 import com.andreitudose.progwebjava.model.Student;
@@ -144,7 +145,7 @@ public class YearOfStudyServiceTests {
     }
 
     @Test
-    void yearOfStudyCreate() throws BadRequestException, NotFoundException {
+    void yearOfStudyCreate() throws BadRequestException, NotFoundException, DuplicateItemException {
 
         when(studentRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(new Student(){{
             setId(2);
@@ -176,27 +177,33 @@ public class YearOfStudyServiceTests {
         verify(yearOfStudyRepositoryMock, times(1)).save(any(YearOfStudy.class));
     }
 
-//    @Test
-//    void programmeCreateBadRequest() throws BadRequestException {
-//        when(studentRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(new Student()));
-//
-//        ProgrammeRequestDto request = new ProgrammeRequestDto() {{
-//            setName(null);
-//        }};
-//
-//        var exception = assertThrows(BadRequestException.class, () -> {
-//            programmeService.create(1, request);
-//        });
-//
-//        var expectedMessage = SerializationUtils.serialize(new HashMap<String, String>() {{
-//            put("name", "must not be blank");
-//        }});
-//        var actualMessage = exception.getMessage();
-//
-//        assertEquals(expectedMessage, actualMessage);
-//    }
-//
-//
+    @Test
+    void yearOfStudyCreateBadRequest() throws BadRequestException {
+        when(studentRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(new Student(){{
+            setProgrammes(Set.of(new Programme(){{
+                setId(1);
+            }}));
+        }}));
+
+        YearOfStudyRequestDto request = new YearOfStudyRequestDto() {{
+            setNumber(1);
+            setCalendarYearOfStart(5);
+            setCalendarYearOfEnd(2001);
+        }};
+
+        var exception = assertThrows(BadRequestException.class, () -> {
+            yearOfStudyService.create(1, 1, request);
+        });
+
+        var expectedMessage = SerializationUtils.serialize(new HashMap<String, String>() {{
+            put("calendarYearOfStart", "must be greater than or equal to 1900");
+        }});
+        var actualMessage = exception.getMessage();
+
+        assertEquals(expectedMessage, actualMessage);
+    }
+
+
 //    @Test
 //    void programmeUpdate() throws NotFoundException, BadRequestException {
 //

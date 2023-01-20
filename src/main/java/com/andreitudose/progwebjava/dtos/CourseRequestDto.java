@@ -1,10 +1,7 @@
 package com.andreitudose.progwebjava.dtos;
 
 import com.andreitudose.progwebjava.model.Course;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
@@ -13,12 +10,15 @@ public class CourseRequestDto {
     @Size(min = 1, max = 100)
     private String name;
 
+    @NotNull
+    private Integer courseTypeId;
+
     @Min(value = 1)
     private Integer numberOfCredits;
 
     @Min(0)
     @Max(10)
-    private BigDecimal grade;
+    private Integer grade;
 
     public Course toCourse(Course course) {
         course.setName(this.getName());
@@ -36,6 +36,14 @@ public class CourseRequestDto {
         this.name = name;
     }
 
+    public Integer getCourseTypeId() {
+        return courseTypeId;
+    }
+
+    public void setCourseTypeId(Integer courseTypeId) {
+        this.courseTypeId = courseTypeId;
+    }
+
     public Integer getNumberOfCredits() {
         return numberOfCredits;
     }
@@ -44,11 +52,11 @@ public class CourseRequestDto {
         this.numberOfCredits = numberOfCredits;
     }
 
-    public BigDecimal getGrade() {
+    public Integer getGrade() {
         return grade;
     }
 
-    public void setGrade(BigDecimal grade) {
+    public void setGrade(Integer grade) {
         this.grade = grade;
     }
 }

@@ -1,12 +1,6 @@
 package com.andreitudose.progwebjava.dtos;
 
 import com.andreitudose.progwebjava.model.Course;
-import com.andreitudose.progwebjava.model.Semester;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-
-import java.math.BigDecimal;
 
 public class CourseResponseDto {
     private Integer id;
@@ -15,7 +9,7 @@ public class CourseResponseDto {
 
     private Integer numberOfCredits;
 
-    private BigDecimal grade;
+    private Integer grade;
 
     public CourseResponseDto fromCourse(Course course) {
 
@@ -52,11 +46,11 @@ public class CourseResponseDto {
         this.numberOfCredits = numberOfCredits;
     }
 
-    public BigDecimal getGrade() {
+    public Integer getGrade() {
         return grade;
     }
 
-    public void setGrade(BigDecimal grade) {
+    public void setGrade(Integer grade) {
         this.grade = grade;
     }
 }

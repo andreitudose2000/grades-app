@@ -6,6 +6,7 @@ import com.andreitudose.progwebjava.dtos.ProgrammeResponseDto;
 import com.andreitudose.progwebjava.dtos.StudentDetailedResponseDto;
 import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.ProgrammeService;
 import jakarta.validation.Valid;
@@ -49,7 +50,7 @@ public class ProgrammeController {
             @PathVariable Integer studentId,
             @Valid @RequestBody ProgrammeRequestDto request
     )
-            throws URISyntaxException, NotFoundException, BadRequestException {
+            throws URISyntaxException, NotFoundException, BadRequestException, DuplicateItemException {
         var response = programmeService.create(studentId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -64,7 +65,7 @@ public class ProgrammeController {
             @PathVariable Integer id,
             @Valid @RequestBody ProgrammeRequestDto request
     )
-            throws URISyntaxException, NotFoundException, BadRequestException {
+            throws URISyntaxException, NotFoundException, BadRequestException, DuplicateItemException {
         var response = programmeService.update(studentId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -80,5 +81,15 @@ public class ProgrammeController {
         programmeService.delete(studentId, id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}/average")
+    public Double getAverage(@PathVariable Integer id) throws NotFoundException {
+        return programmeService.getGradeAverage(id);
+    }
+
+    @GetMapping("/{id}/credits")
+    public Integer getAccumulatedCredits(@PathVariable Integer id) throws NotFoundException {
+        return programmeService.getTotalCredits(id);
     }
 }

@@ -2,6 +2,7 @@ package com.andreitudose.progwebjava.controllers;
 
 import com.andreitudose.progwebjava.dtos.CourseRequestDto;
 import com.andreitudose.progwebjava.dtos.CourseResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.CourseService;
@@ -55,7 +56,7 @@ public class CourseController {
             @PathVariable Integer semesterId,
             @Valid @RequestBody CourseRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, BadRequestException {
         var response = courseService.create(studentId, programmeId, yearOfStudyId, semesterId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -79,7 +80,7 @@ public class CourseController {
             @PathVariable Integer id,
             @Valid @RequestBody CourseRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, BadRequestException {
         var response = courseService.update(studentId, programmeId, yearOfStudyId, semesterId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();

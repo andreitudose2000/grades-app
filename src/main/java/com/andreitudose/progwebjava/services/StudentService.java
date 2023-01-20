@@ -54,7 +54,7 @@ public class StudentService {
 
     public StudentResponseDto create(StudentRequestDto request) throws BadRequestException, DuplicateItemException {
 
-        Set<ConstraintViolation<StudentRequestDto>> validationResult = validator.validate(request);
+        var validationResult = validator.validate(request);
 
         if(validationResult.size() > 0) {
             throw new BadRequestException(ValidationUtils.getErrors(validationResult));
@@ -76,7 +76,7 @@ public class StudentService {
     public StudentResponseDto update(Integer id, StudentRequestDto request)
             throws NotFoundException, BadRequestException, DuplicateItemException {
 
-        Set<ConstraintViolation<StudentRequestDto>> validationResult = validator.validate(request);
+        var validationResult = validator.validate(request);
 
         if(validationResult.size() > 0) {
             throw new BadRequestException(ValidationUtils.getErrors(validationResult));

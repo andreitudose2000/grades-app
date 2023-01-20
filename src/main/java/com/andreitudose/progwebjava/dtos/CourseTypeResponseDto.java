@@ -2,8 +2,6 @@ package com.andreitudose.progwebjava.dtos;
 
 import com.andreitudose.progwebjava.model.CourseType;
 
-import java.math.BigDecimal;
-
 public class CourseTypeResponseDto {
     private Integer id;
     private String name;

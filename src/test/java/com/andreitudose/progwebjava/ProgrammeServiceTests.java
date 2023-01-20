@@ -3,6 +3,7 @@ package com.andreitudose.progwebjava;
 import com.andreitudose.progwebjava.dtos.*;
 import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.model.Programme;
 import com.andreitudose.progwebjava.model.Student;
@@ -127,7 +128,7 @@ public class ProgrammeServiceTests {
     }
 
     @Test
-    void programmeCreate() throws BadRequestException, NotFoundException {
+    void programmeCreate() throws BadRequestException, NotFoundException, DuplicateItemException {
 
         when(studentRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(new Student()));
         ProgrammeRequestDto request = new ProgrammeRequestDto() {{
@@ -176,7 +177,7 @@ public class ProgrammeServiceTests {
 
 
     @Test
-    void programmeUpdate() throws NotFoundException, BadRequestException {
+    void programmeUpdate() throws NotFoundException, BadRequestException, DuplicateItemException {
 
         Programme programme = new Programme() {{
             setId(2);

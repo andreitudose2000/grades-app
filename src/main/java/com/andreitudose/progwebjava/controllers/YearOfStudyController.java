@@ -3,7 +3,9 @@ package com.andreitudose.progwebjava.controllers;
 import com.andreitudose.progwebjava.dtos.YearOfStudyDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.YearOfStudyRequestDto;
 import com.andreitudose.progwebjava.dtos.YearOfStudyResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.YearOfStudyService;
 import jakarta.validation.Valid;
@@ -49,7 +51,7 @@ public class YearOfStudyController {
             @PathVariable Integer programmeId,
             @Valid @RequestBody YearOfStudyRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = yearOfStudyService.create(studentId, programmeId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -69,7 +71,7 @@ public class YearOfStudyController {
             @PathVariable Integer id,
             @Valid @RequestBody YearOfStudyRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, DuplicateItemException, BadRequestException {
         var response = yearOfStudyService.update(studentId, programmeId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -93,5 +95,15 @@ public class YearOfStudyController {
         yearOfStudyService.delete(studentId, programmeId, id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}/average")
+    public Double getAverage(@PathVariable Integer id) throws NotFoundException {
+        return yearOfStudyService.getGradeAverage(id);
+    }
+
+    @GetMapping("/{id}/credits")
+    public Integer getAccumulatedCredits(@PathVariable Integer id) throws NotFoundException {
+        return yearOfStudyService.getTotalCredits(id);
     }
 }

@@ -1,20 +1,26 @@
 package com.andreitudose.progwebjava.services;
 
-import com.andreitudose.progwebjava.dtos.*;
+import com.andreitudose.progwebjava.dtos.CourseTypeDetailedResponseDto;
+import com.andreitudose.progwebjava.dtos.CourseTypeRequestDto;
+import com.andreitudose.progwebjava.dtos.CourseTypeResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.model.CourseType;
 import com.andreitudose.progwebjava.model.Programme;
 import com.andreitudose.progwebjava.model.Student;
-import com.andreitudose.progwebjava.model.YearOfStudy;
 import com.andreitudose.progwebjava.repositories.CourseTypeRepository;
 import com.andreitudose.progwebjava.repositories.StudentRepository;
+import com.andreitudose.progwebjava.utils.ValidationUtils;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,11 +62,19 @@ public class CourseTypeService {
     }
 
     public CourseTypeResponseDto create(Integer studentId, Integer programmeId, CourseTypeRequestDto request)
-            throws NotFoundException {
+            throws NotFoundException, BadRequestException, DuplicateItemException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<CourseTypeRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var programme = getProgrammeIfExists(studentId, programmeId);
+
+        if(programme.getCourseTypes().stream().anyMatch(x -> x.getName().equals(request.getName()))) {
+            throw new DuplicateItemException("Course type", "name", request.getName());
+        }
 
         CourseType courseType = request.toCourseType(new CourseType());
 
@@ -72,11 +86,20 @@ public class CourseTypeService {
     }
 
     public CourseTypeResponseDto update(Integer studentId, Integer programmeId, Integer id, CourseTypeRequestDto request)
-            throws NotFoundException {
+            throws NotFoundException, DuplicateItemException, BadRequestException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<CourseTypeRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var programme = getProgrammeIfExists(studentId, programmeId);
+
+        if(programme.getCourseTypes().stream().anyMatch(x ->
+                !x.getId().equals(id) && x.getName().equals(request.getName()))) {
+            throw new DuplicateItemException("Course type", "name", request.getName());
+        }
 
         var courseType = programme.getCourseTypes().stream().filter(x -> x.getId().equals(id)).findFirst();
 
@@ -123,7 +146,7 @@ public class CourseTypeService {
         var programme = student.getProgrammes().stream().filter(x -> x.getId().equals(programmeId)).findFirst();
 
         if(programme.isEmpty()) {
-            throw new NotFoundException("Programme", "id", studentId.toString());
+            throw new NotFoundException("Programme", "id", programmeId.toString());
         }
 
         return programme.get();
