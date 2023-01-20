@@ -102,7 +102,24 @@ Tipuri de răspunsuri:
 - 409 Conflict - încălcarea unei reguli de unicitate
 
 #### Delete
+O resursă nu poate fi ștearsă dacă altele depind de ea. De exemplu, un semestru nu poate fi șters dacă sunt cursuri asignate lui.
+
 Tipuri de răspunsuri:
 - 204 No Content - resursa a fost ștearsă
 - 404 Not Found - resursa nu a fost găsită
 - 409 Conflict - resursa are alte resurse dependente de ea
+
+
+### Calcularea mediei generale și a numărului de credite
+
+#### Pe semestru
+GET `/students/{studentId}/programmes/{programmeId}/years-of-study/{yearOfStudyId}/semesters/{id}/average`
+GET `/students/{studentId}/programmes/{programmeId}/years-of-study/{yearOfStudyId}/semesters/{id}/credits`
+
+#### Pe an
+GET `/students/{studentId}/programmes/{programmeId}/years-of-study/{id}/average`
+GET `/students/{studentId}/programmes/{programmeId}/years-of-study/{id}/credits`
+
+#### Pe facultate
+GET `/students/{studentId}/programmes/{programmeId}/{id}/average`
+GET `/students/{studentId}/programmes/{programmeId}/{id}/credits`
