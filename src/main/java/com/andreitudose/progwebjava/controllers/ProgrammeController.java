@@ -4,6 +4,7 @@ import com.andreitudose.progwebjava.dtos.ProgrammeDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.ProgrammeRequestDto;
 import com.andreitudose.progwebjava.dtos.ProgrammeResponseDto;
 import com.andreitudose.progwebjava.dtos.StudentDetailedResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.ProgrammeService;
@@ -48,7 +49,7 @@ public class ProgrammeController {
             @PathVariable Integer studentId,
             @Valid @RequestBody ProgrammeRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, BadRequestException {
         var response = programmeService.create(studentId, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -63,7 +64,7 @@ public class ProgrammeController {
             @PathVariable Integer id,
             @Valid @RequestBody ProgrammeRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, BadRequestException {
         var response = programmeService.update(studentId, id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();

@@ -3,6 +3,8 @@ package com.andreitudose.progwebjava.services;
 import com.andreitudose.progwebjava.dtos.ProgrammeDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.ProgrammeRequestDto;
 import com.andreitudose.progwebjava.dtos.ProgrammeResponseDto;
+import com.andreitudose.progwebjava.dtos.StudentRequestDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.model.Programme;
@@ -10,12 +12,15 @@ import com.andreitudose.progwebjava.model.Student;
 import com.andreitudose.progwebjava.repositories.ProgrammeRepository;
 import com.andreitudose.progwebjava.repositories.StudentRepository;
 import com.andreitudose.progwebjava.repositories.YearOfStudyRepository;
+import com.andreitudose.progwebjava.utils.ValidationUtils;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,9 +60,13 @@ public class ProgrammeService {
         return new ProgrammeDetailedResponseDto().fromProgramme(programme.get());
     }
 
-    public ProgrammeResponseDto create(Integer studentId, ProgrammeRequestDto request) throws NotFoundException {
+    public ProgrammeResponseDto create(Integer studentId, ProgrammeRequestDto request) throws NotFoundException, BadRequestException {
 
-        validator.validate(request);
+        var validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var student = getStudentIfExists(studentId);
 
@@ -70,9 +79,13 @@ public class ProgrammeService {
         return new ProgrammeResponseDto().fromProgramme(createdProgramme);
     }
 
-    public ProgrammeResponseDto update(Integer studentId, Integer id, ProgrammeRequestDto request) throws NotFoundException {
+    public ProgrammeResponseDto update(Integer studentId, Integer id, ProgrammeRequestDto request) throws NotFoundException, BadRequestException {
 
-        validator.validate(request);
+        var validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
 
         var student = getStudentIfExists(studentId);
 

@@ -2,16 +2,20 @@ package com.andreitudose.progwebjava.dtos;
 
 import com.andreitudose.progwebjava.model.Student;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class StudentRequestDto {
 
+    @NotBlank
     @Size(min = 1, max = 100)
     private String firstName;
 
+    @NotBlank
     @Size(min = 1, max = 100)
     private String lastName;
 
+    @NotBlank
     @Size(min = 1, max = 100)
     @Email
     private String email;

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="yearsOfStudy")
+@Table(name="years_of_study", uniqueConstraints = {@UniqueConstraint(columnNames = {"programme_id", "number"})})
 public class YearOfStudy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

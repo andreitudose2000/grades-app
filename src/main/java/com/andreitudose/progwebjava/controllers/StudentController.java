@@ -3,7 +3,9 @@ package com.andreitudose.progwebjava.controllers;
 import com.andreitudose.progwebjava.dtos.StudentDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.StudentRequestDto;
 import com.andreitudose.progwebjava.dtos.StudentResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
 import com.andreitudose.progwebjava.services.StudentService;
 import jakarta.validation.Valid;
@@ -42,7 +44,7 @@ public class StudentController {
 
     @PostMapping
     public ResponseEntity<StudentResponseDto> create(@Valid @RequestBody StudentRequestDto request)
-            throws URISyntaxException {
+            throws URISyntaxException, BadRequestException, DuplicateItemException {
         var response = studentService.create(request);
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -56,7 +58,7 @@ public class StudentController {
             @PathVariable Integer id,
             @Valid @RequestBody StudentRequestDto request
     )
-            throws URISyntaxException, NotFoundException {
+            throws URISyntaxException, NotFoundException, BadRequestException, DuplicateItemException {
         var response = studentService.update(id, request);
 
         HttpHeaders responseHeaders = new HttpHeaders();

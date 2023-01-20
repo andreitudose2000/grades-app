@@ -19,7 +19,7 @@ public class Student {
     @Column(nullable = false, length = 100)
     private String lastName;
     @NotBlank
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String email;
 
     @OneToMany(mappedBy="student", cascade = CascadeType.ALL, orphanRemoval = true)

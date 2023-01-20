@@ -3,29 +3,30 @@ package com.andreitudose.progwebjava.services;
 import com.andreitudose.progwebjava.dtos.StudentDetailedResponseDto;
 import com.andreitudose.progwebjava.dtos.StudentRequestDto;
 import com.andreitudose.progwebjava.dtos.StudentResponseDto;
+import com.andreitudose.progwebjava.exceptions.BadRequestException;
 import com.andreitudose.progwebjava.exceptions.CannotDeleteException;
+import com.andreitudose.progwebjava.exceptions.DuplicateItemException;
 import com.andreitudose.progwebjava.exceptions.NotFoundException;
-import com.andreitudose.progwebjava.model.Programme;
 import com.andreitudose.progwebjava.model.Student;
-import com.andreitudose.progwebjava.repositories.ProgrammeRepository;
 import com.andreitudose.progwebjava.repositories.StudentRepository;
+import com.andreitudose.progwebjava.utils.ValidationUtils;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
-    private final ProgrammeRepository programmeRepository;
     private final Validator validator;
 
-    public StudentService(StudentRepository studentRepository, ProgrammeRepository programmeRepository) {
+    public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
-        this.programmeRepository = programmeRepository;
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -33,7 +34,9 @@ public class StudentService {
 
     public List<StudentResponseDto> getAll() {
 
-        return studentRepository.findAll().stream()
+        var xy = studentRepository.findAll();
+
+        return xy.stream()
                 .map(x -> new StudentResponseDto().fromStudent(x))
                 .collect(Collectors.toList());
     }
@@ -49,9 +52,19 @@ public class StudentService {
         return new StudentDetailedResponseDto().fromStudent(student.get());
     }
 
-    public StudentResponseDto create(StudentRequestDto request) {
+    public StudentResponseDto create(StudentRequestDto request) throws BadRequestException, DuplicateItemException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<StudentRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
+
+        var students = studentRepository.findAll();
+
+        if(students.stream().anyMatch(x -> x.getEmail().equals(request.getEmail()))) {
+            throw new DuplicateItemException("Student", "email", request.getEmail());
+        }
 
         Student student = request.toStudent(new Student());
 
@@ -60,9 +73,20 @@ public class StudentService {
         return new StudentResponseDto().fromStudent(createdStudent);
     }
 
-    public StudentResponseDto update(Integer id, StudentRequestDto request) throws NotFoundException {
+    public StudentResponseDto update(Integer id, StudentRequestDto request)
+            throws NotFoundException, BadRequestException, DuplicateItemException {
 
-        validator.validate(request);
+        Set<ConstraintViolation<StudentRequestDto>> validationResult = validator.validate(request);
+
+        if(validationResult.size() > 0) {
+            throw new BadRequestException(ValidationUtils.getErrors(validationResult));
+        }
+
+        var students = studentRepository.findAll();
+
+        if(students.stream().anyMatch(x -> !x.getId().equals(id) && x.getEmail().equals(request.getEmail()))) {
+            throw new DuplicateItemException("Student", "email", request.getEmail());
+        }
 
         var student = studentRepository.findById(id);
 

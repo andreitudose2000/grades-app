@@ -1,9 +1,11 @@
 package com.andreitudose.progwebjava.dtos;
 
 import com.andreitudose.progwebjava.model.Programme;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class ProgrammeRequestDto {
+    @NotBlank
     @Size(min = 1, max = 100)
     private String name;
 

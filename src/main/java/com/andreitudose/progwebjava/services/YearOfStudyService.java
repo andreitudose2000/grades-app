@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 @Service
 public class YearOfStudyService {
     private final YearOfStudyRepository yearOfStudyRepository;
-    private final ProgrammeRepository programmeRepository;
     private final StudentRepository studentRepository;
 
-    public YearOfStudyService(ProgrammeRepository programmeRepository, YearOfStudyRepository yearOfStudyRepository,
+    public YearOfStudyService(YearOfStudyRepository yearOfStudyRepository,
                               StudentRepository studentRepository) {
-        this.programmeRepository = programmeRepository;
         this.yearOfStudyRepository = yearOfStudyRepository;
         this.studentRepository = studentRepository;
     }
@@ -44,7 +42,7 @@ public class YearOfStudyService {
         var yearOfStudy = programme.getYearsOfStudy().stream().filter(x -> x.getId().equals(id)).findFirst();
 
         if(yearOfStudy.isEmpty()) {
-            throw new NotFoundException("YearOfStudy", "id", id.toString());
+            throw new NotFoundException("Year of study", "id", id.toString());
         }
 
         return new YearOfStudyDetailedResponseDto().fromYearOfStudy(yearOfStudy.get());
